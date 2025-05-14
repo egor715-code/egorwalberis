@@ -35,6 +35,9 @@ class Product(models.Model):
     class Meta:
         verbose_name = "Товары"
         verbose_name_plural = "Товары"
+    
+    def __str__(self):
+        return self.name
 
 class Category(models.Model):
     name = models.CharField(
