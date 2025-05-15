@@ -110,3 +110,38 @@ nav .nav-links .nav-link a {
   font-weight: 700;
   color: rgb(195, 22, 234);
 }
+
+.categories {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 16px;
+  margin: 20px 30px;
+  color: black;
+  font-family: Arial, sans-serif;
+}
+
+.product-details {
+  display: flex;
+}
+
+.desc {
+  padding-top: 10px;
+}
+
+.price {
+  padding: 15px;
+  display: flex;
+  justify-content: center;
+  border-color: #e212e5;
+  border-width: 5px;
+  border-style: ;
+  border-radius: 5px;
+  background-color: #e212e5;
+  width: 100px;
+  height: 40px;
+}
+
+.product-details-image {
+  padding-left: 5px;
+}
