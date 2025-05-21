@@ -1,5 +1,5 @@
 from django.db import models
-
+from django.contrib.auth.models import User
 
 class Product(models.Model):
     name = models.CharField(
@@ -13,9 +13,9 @@ class Product(models.Model):
 
     price = models.DecimalField(
         verbose_name="Цена",
-        max_digits=10,
+        max_digits=10, 
         decimal_places=2,
-    )
+        )
 
     image = models.ImageField(
         verbose_name="Изображение",
@@ -31,13 +31,27 @@ class Product(models.Model):
         verbose_name="Бренд",
         on_delete=models.CASCADE,
     )
+    slug = models.SlugField(
+        "URL",
+        max_length=250,
+        unique=True, 
+        null=True,
+        editable=True,
+    )
+
 
     class Meta:
-        verbose_name = "Товары"
-        verbose_name_plural = "Товары"
-    
-    def __str__(self):
+        verbose_name="Товар"
+        verbose_name_plural="Товары"
+    def str(self):
         return self.name
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
+
 
 class Category(models.Model):
     name = models.CharField(
@@ -51,15 +65,24 @@ class Category(models.Model):
         null=True,
         blank=True,
     )
-
-
-
+    slug = models.SlugField(
+        "URL", 
+        max_length=250,
+        unique=True, 
+        null=True,
+        editable=True,
+    )
+    
     class Meta:
-        verbose_name = "Кадегории"
-        verbose_name_plural = "Категории"
-
-    def __str__(self):
+        verbose_name="Категория"
+        verbose_name_plural="Категории"
+    def str(self):
         return self.name
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super().save(*args, **kwargs)
+
 
 class Brand(models.Model):
     name = models.CharField(
@@ -76,8 +99,38 @@ class Brand(models.Model):
         max_length=200,
     )
     class Meta:
-        verbose_name = "Бренд"
-        verbose_name_plural = "Бренд"
+        verbose_name="Бренд"
+        verbose_name_plural="Бренды"
+
+    def str(self):
+        return self.name
     
-    def  __str__(self):
-        return self.name 
+    # price 
+    # brand 
+    # name
+    # category
+    # desc
+    # image
+
+# Create your models here.
+class Cart(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, null=True, blank=True)
+    session_key = models.CharField(max_length=100, null=True, blank=True)  # для неавторизованных
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def str(self):
+        return f"Cart {self.id}"
+
+
+class CartItem(models.Model):
+    cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name='items')
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    quantity = models.PositiveIntegerField(default=1)
+    added_at = models.DateTimeField(auto_now_add=True)
+
+    def str(self):
+        return f"{self.quantity} x {self.product.name}"
+
+    @property
+    def total_price(self):
+        return self.quantity * self.product.price
